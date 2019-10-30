@@ -40,7 +40,7 @@
                     发送时间：
                 </el-table-column>
                 <el-table-column>
-                    1292
+                    {{reportData.runTimeText}}
                 </el-table-column>
                 <el-table-column width="150">
                     发送计数：
@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import { formatTimeToStr } from '../../common/date.js';
     export default {
         data: function(){
             return {
@@ -96,6 +97,7 @@
                 .then(data =>{
                     if(data.status){
                         this.reportData = data.data;
+                        this.reportData.runTimeText = formatTimeToStr(this.reportData.sTime,'yyyy-MM-dd hh:mm') + '--' + formatTimeToStr(this.reportData.eTime,'hh:mm');
                         this.todoList.push({
                             index:1,
                             userServiceName:this.reportData.userServiceName,

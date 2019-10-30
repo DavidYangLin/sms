@@ -71,6 +71,11 @@
                             @click="closeService(scope.$index, scope.row)"
                         >关闭</el-button>
                         <el-button
+                            type="text"
+                            icon="el-icon-edit"
+                            @click="deleteUser(scope.$index, scope.row)"
+                        >删除</el-button>
+                        <el-button
                             v-if=" scope.row.serviceStatus != 0"
                             type="text"
                             icon="el-icon-delete"
@@ -252,13 +257,36 @@ export default {
             this.getData();
         },
         // 删除操作
+        deleteUser(index, row) {
+            // 二次确认删除
+            this.$confirm('确定要删除该用户吗？', '提示', {
+                type: 'warning'
+            })
+            .then(() => {
+                this.axios.delete('Mass/DeleteUser',{params:{userId:row.userId}})
+                .then(data => {
+                    if(data.status){
+                        this.$message.success('删除成功!');
+                        this.query.pageIndex = 0;
+                        this.getData();
+                    }
+                })
+                .catch(err=>{
+                    
+                })
+                // this.$message.success('删除成功');
+                // this.tableData.splice(index, 1);
+            })
+            .catch(() => {});
+        },
+        // 删除操作
         handleDelete(index, row) {
             // 二次确认删除
             this.$confirm('确定要清零该服务吗？', '提示', {
                 type: 'warning'
             })
             .then(() => {
-                this.axios.post('Mass/DeleteService',{},{params:{userId:row.userId}})
+                this.axios.delete('Mass/DeleteService',{params:{userId:row.userId}})
                 .then(data => {
                     if(data.status){
                         this.$message.success('清除成功!');
