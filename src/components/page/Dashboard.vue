@@ -37,7 +37,7 @@
                 </el-table-column>
             </el-table>
             <br />
-            <el-table border class="table"
+            <el-table v-el-table-infinite-scroll="load" border class="table scrollTable"
                 ref="multipleTable"
                 header-cell-class-name="table-header" :data="todoList" height="300" style="width: 100%;font-size:14px;">
                 <el-table-column type="index" label="序号" width="80">
@@ -73,8 +73,13 @@
 <script>
     import Schart from 'vue-schart';
     import bus from '../common/bus';
+    import elTableInfiniteScroll from 'el-table-infinite-scroll';
+
     export default {
         name: 'dashboard',
+        directives: {
+            'el-table-infinite-scroll': elTableInfiniteScroll
+        },
         data() {
             return {
                 todoList:[],
@@ -91,35 +96,7 @@
             // this.handleListener();
             // this.changeDate();
         },
-        activated(){
-            // this.handleListener();
-        },
-        // deactivated(){
-        //     window.removeEventListener('resize', this.renderChart);
-        //     bus.$off('collapse', this.handleBus);
-        // },
         methods: {
-            // changeDate(){
-            //     const now = new Date().getTime();
-            //     this.data.forEach((item, index) => {
-            //         const date = new Date(now - (6 - index) * 86400000);
-            //         item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
-            //     })
-            // },
-            // handleListener(){
-            //     bus.$on('collapse', this.handleBus);
-            //     // 调用renderChart方法对图表进行重新渲染
-            //     window.addEventListener('resize', this.renderChart)
-            // },
-            // handleBus(msg){
-            //     setTimeout(() => {
-            //         this.renderChart()
-            //     }, 300);
-            // },
-            // renderChart(){
-            //     this.$refs.bar.renderChart();
-            //     this.$refs.line.renderChart();
-            // }
             getDetail(){
                 this.axios.post('Mass/UserReport')
                 .then(data =>{
@@ -133,13 +110,16 @@
                             this.reportData.statusText = '已关闭';
                             this.reportData.rdCount = '--';
                         }
-                        for(var i = 0; i< this.reportData.pushEquipmentNum;i++) {
-                            this.todoList.push({
-                                mac: this.roundMAC(),
-                                ip: this.roundIP(),
-                                host: this.roundHOST()
-                            })
-                        }
+                        // let count = this.reportData.pushEquipmentNum > 100 ? 100:this.reportData.pushEquipmentNum;
+                        // for(var i = 0; i< count;i++) {
+                        //     this.todoList.push({
+                        //         mac: this.roundMAC(),
+                        //         ip: this.roundIP(),
+                        //         host: this.roundHOST()
+                        //     })
+                        // }
+                        this.todoList = [];
+                        this.pushData(this.reportData.pushEquipmentNum);
                     }
                 }).catch(err => {
                     // this.$message.error(err.error.message);
@@ -149,7 +129,7 @@
                 return `${this.randomString(2)}:${this.randomString(2)}:${this.randomString(2)}:${this.randomString(2)}:**:**`;
             },
             roundIP(){
-                return `10.0.${parseInt(Math.random()*255)}.${parseInt(Math.random()*255)}`;
+                return `**.*.${parseInt(Math.random()*255)}.${parseInt(Math.random()*255)}`;
             },
             roundHOST(){
                 let phoneHead = ['Honor_','OPPO-','vivo-','USER-','android-','HUAWEI_','Redmi4A-','MIMAX-'];
@@ -164,6 +144,24 @@
             　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
             　　}
             　　return pwd;
+            },
+            pushData(total) {
+                let count = total > 200 ? 200:total;
+                let arr = [];
+                for(var i = 0; i< count;i++) {
+                    arr.push({
+                        mac: this.roundMAC(),
+                        ip: this.roundIP(),
+                        host: this.roundHOST()
+                    })
+                }
+                this.todoList = this.todoList.concat(arr);
+            },
+            load() {
+                if(this.reportData.pushEquipmentNum){
+                    let count = this.reportData.pushEquipmentNum - this.todoList.length;
+                    this.pushData(count);
+                }
             }
         }
     }

@@ -20,6 +20,11 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
                 {
+                    path: '/userCenter',
+                    component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
+                    meta: { title: '个人中心' }
+                },
+                {
                     path: '/icon',
                     component: () => import(/* webpackChunkName: "icon" */ '../components/page/Icon.vue'),
                     meta: { title: '自定义图标' }

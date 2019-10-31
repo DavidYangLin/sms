@@ -70,6 +70,12 @@
                             icon="el-icon-edit"
                             @click="closeService(scope.$index, scope.row)"
                         >关闭</el-button>
+                       <el-button
+                            v-if=" scope.row.serviceStatus == 1"
+                            type="text"
+                            icon="el-icon-edit"
+                            @click="pause(scope.row)"
+                        >暂停</el-button>
                         <el-button
                             type="text"
                             icon="el-icon-edit"
@@ -82,6 +88,12 @@
                             class="red"
                             @click="handleDelete(scope.$index, scope.row)"
                         >计数清零</el-button>
+                        <el-button
+                            type="text"
+                            icon="el-icon-delete"
+                            class="red"
+                            @click="resetPwd(scope.row)"
+                        >重置密码</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -183,6 +195,7 @@
 <script>
 import { fetchData } from '../../api/index';
 import { formatTimeToStr } from '../../common/date.js';
+
 let _ = require('lodash');
 
 export default {
@@ -278,6 +291,26 @@ export default {
                 // this.tableData.splice(index, 1);
             })
             .catch(() => {});
+        },
+        resetPwd(row){
+            this.$confirm('确定要重该用户密码吗？', '提示', {
+                type: 'warning'
+            })
+            .then(() => {
+                this.axios.post('Mass/ResetPwd',{params:{userId:row.userId}})
+                .then(data => {
+                    if(data.status){
+                        this.$message.success('重置成功!');
+                        this.query.pageIndex = 0;
+                        this.getData();
+                    }
+                })
+                .catch(err=>{
+                    
+                })
+            })
+            .catch(() => {});
+
         },
         // 删除操作
         handleDelete(index, row) {
@@ -378,6 +411,22 @@ export default {
                     })    
                 }
             })
+        },
+        pause(row){
+            this.$confirm('确定要暂停服务吗？', '提示', {
+                type: 'warning'
+            })
+            .then(() => {
+                this.axios.post('Mass/Pause',{serviceId: row.serviceId})
+                .then((data)=>{
+                    if(data.status){
+                        this.$message.success('暂停成功!');
+                    }else{
+                        this.$message.error(data.message);                        
+                    }
+                })
+            })
+            .catch(() => {});
         },
         getPubBase(){
             this.axios.get('Mass/GetPushBase')
