@@ -12,7 +12,7 @@
     "babel-polyfill": "^6.26.0",
     "el-table-infinite-scroll": "^1.0.0",
     "element-ui": "^2.11.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mavon-editor": "^2.6.17",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
